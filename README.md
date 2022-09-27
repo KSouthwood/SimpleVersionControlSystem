@@ -43,6 +43,29 @@ depending on the argument, print help information.
 
 #### _Add first commands to your VCS that will allow you to add new files._
 
+In this stage, your program should allow a user to set their name and add the
+files they want to track. Store a username in _config.txt_.
+
+_index.txt_ stores the files that were added to the index. Don't forget to 
+store all the files of the version control system in the _vcs_ directory. 
+You should create this directory programmatically. It may look something 
+like this:
+```text
+|---- vcs
+|     |---- config.txt
+|     |---- index.txt
+|
+|---- tracked_file.txt
+|---- untracked_file.txt
+```
+
+You need to work on the following commands:
+- `config` should allow the user to set their own name or output an already 
+  existing name. If a user wants to set a new name, the program must 
+  overwrite the old one.
+- `add` should allow the user to set the name of a file that they want to 
+  track or output the names of tracked files. If the file does not exist, 
+  the program should inform a user that the file does not exist.
 
 ### Stage 3: [Log & commit](https://hyperskill.org/projects/177/stages/911/implement)
 
