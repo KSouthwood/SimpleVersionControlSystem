@@ -71,6 +71,36 @@ You need to work on the following commands:
 
 #### _Continue implementing new commands to save file changes and log the results._
 
+In this stage, you should implement two commands. `commit` will allow a 
+user to save file changes; `log` will allow the viewing the commit history.
+
+The purpose of this project is to work with files. Store different file 
+versions in the index according to the commits and make sure that each 
+commit has a unique ID. ID should allow you to find a specific file 
+version that matches this commit. You need to think about the concept of a 
+commit ID.
+
+You can store commits in _vsc/commits_. Each commit will be saved to a 
+different directory. These directories will include a commits ID and 
+additional information that you can store in _vsc/log.txt_.
+
+You will also need to find out if a file has been changed since the last 
+commit. For that, you need to calculate the hash of the current file and 
+the hash of the last commit. If these values are different, then the file has
+been changed. Use **Java Cryptography Architecture** (JCA). JCA includes 
+solutions that are based on various cryptographic algorithms such as 
+**SHA1**, **SHA256**, and others. Hash functions are optional, you can use 
+a different solution.
+
+Implement the following commands:
+- `commit` must be passed to the program along with a message. (i.e. 
+  `commit "sample commit message"`.) Save all 
+  changes. Each commit must be assigned a unique ID. If there were no 
+  changes since the last commit, do not create a new commit. You don't 
+  need to optimize the storage of changes, just copy all the staged files 
+  to the commit folder every time.
+- `log` should show all the commits in reverse order.
+
 ### Stage 4: [Checkout time](https://hyperskill.org/projects/177/stages/912/implement)
 
 #### _Add the last command to switch between commits and retrieve the file contents._
