@@ -8,6 +8,7 @@ class Operations {
     private val configFile = File("${vcsDir}${separator}config.txt")
     private val indexFile = File("${vcsDir}${separator}index.txt")
     private val logFile = File("${vcsDir}${separator}log.txt")
+    private val commitsDir = File("${vcsDir}${separator}commits")
 
     init {
         if (!vcsDir.exists()) {
@@ -15,6 +16,7 @@ class Operations {
             configFile.createNewFile()
             indexFile.createNewFile()
             logFile.createNewFile()
+            commitsDir.mkdir()
         }
     }
 
@@ -77,7 +79,7 @@ class Operations {
             file.forEachLine { line -> msgDigest.update(line.toByteArray()) }
         }
 
-        val digest = msgDigest.digest().joinToString { "%02x".format(it) }
+        val digest = msgDigest.digest().joinToString("") { "%02x".format(it) }
         val prevDigest = if (logFile.length() != 0L)
             logFile.bufferedReader().use { it.readLine() }.drop(7)
         else
@@ -91,22 +93,21 @@ class Operations {
         // changes were made, copy files to commits directory
         val commitDir = File("$commitsDir$separator$digest")
         commitDir.mkdir()
-        indexFile.forEachLine { File("$workingDir$it").copyTo(commitDir) }
+        indexFile.forEachLine { File("$workingDir$it").copyTo(File("$commitDir$separator$it")) }
 
-        // write commit message
-        val oldLogFile = File("${vcsDir}${separator}log.old")
-        if (!logFile.renameTo(oldLogFile)) {
-            println("Rename operation failed.")
-            return
-        }
-        logFile.createNewFile()
-        logFile.writeText("""
+        // write commit message to temp file
+        val tempFile = File.createTempFile("log-", ".tmp") //File("${vcsDir}${separator}log.old")
+        tempFile.writeText("""
             commit $digest
             Author: ${configFile.readText()}
             ${message.first()}
             
         """.trimIndent())
-        oldLogFile.forEachLine { logFile.appendText(it) }
+
+        // append old log file to temp file, then copy temp file over log file
+        logFile.forEachLine { tempFile.appendText("$it\n") }
+        tempFile.copyTo(logFile, true)
+        tempFile.delete()
         println("Changes are committed.")
     }
 

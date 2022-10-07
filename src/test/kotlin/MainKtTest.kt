@@ -15,9 +15,12 @@ import kotlin.test.BeforeTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(SystemStubsExtension::class)
 internal class MainKtTest {
-    private val fileA = File("test_tracked_file1.txt")
-    private val fileB = File("test_tracked_fileA.txt")
-    private val fileUntracked = File("test_untracked.txt")
+    private val filenameA = "test_tracked_file1.txt"
+    private val filenameB = "test_tracked_fileA.txt"
+    private val filenameU = "test_untracked.txt"
+    private val fileA = File(filenameA)
+    private val fileB = File(filenameB)
+    private val fileU = File(filenameU)
 
     @SystemStub
     private val systemOut: SystemOut = SystemOut()
@@ -75,7 +78,8 @@ internal class MainKtTest {
     fun `clean up files and directory`() {
         fileA.delete()
         fileB.delete()
-        fileUntracked.delete()
+        fileU.delete()
+        File("vcs").deleteRecursively()
     }
 
     @Test
@@ -97,23 +101,29 @@ internal class MainKtTest {
 
     @Test
     fun `test add command`() {
+        fileA.createNewFile()
+        fileB.createNewFile()
         systemOut.clear()
+
+        // run commands
         main(arrayOf("add"))
-        main(arrayOf("add", "file_A.txt"))
+        main(arrayOf("add", filenameA))
         main(arrayOf("add"))
-        main(arrayOf("add", "file_B.txt"))
+        main(arrayOf("add", filenameB))
         main(arrayOf("add"))
-        main(arrayOf("add", "file_Z.txt"))
+        main(arrayOf("add", filenameU))
+
+        // check output
         assertEquals("""
             Add a file to the index.
-            The file 'file_A.txt' is tracked.
+            The file '$filenameA' is tracked.
             Tracked files:
-            file_A.txt
-            The file 'file_B.txt' is tracked.
+            $filenameA
+            The file '$filenameB' is tracked.
             Tracked files:
-            file_A.txt
-            file_B.txt
-            Can't find 'file_Z.txt'.
+            $filenameA
+            $filenameB
+            Can't find '$filenameU'.
             
         """.trimIndent(),
         systemOut.linesNormalized)
@@ -123,11 +133,11 @@ internal class MainKtTest {
     fun `test log and commit`() {
         fileA.createNewFile()
         fileB.createNewFile()
-        fileUntracked.createNewFile()
+        fileU.createNewFile()
 
         fileA.writeText("I am the first file.\n")
         fileB.writeText("I am the second file.\n")
-        fileUntracked.writeText("I am ignored.\n")
+        fileU.writeText("I am ignored.\n")
 
         systemOut.clear()
         main(arrayOf("log"))
@@ -135,11 +145,13 @@ internal class MainKtTest {
         assertEquals("No commits yet.\nMessage was not passed.\n", systemOut.linesNormalized)
         systemOut.clear()
 
-        main(arrayOf("add", "test_tracked_file1.txt"))
-        main(arrayOf("add", "test_tracked_fileA.txt"))
+        main(arrayOf("config", "Richard"))
+        main(arrayOf("add", filenameA))
+        main(arrayOf("add", filenameB))
         assertEquals("""
-            The file 'test_tracked_file1.txt' is tracked.
-            The file 'test_tracked_fileA.txt' is tracked.
+            The username is Richard.
+            The file '$filenameA' is tracked.
+            The file '$filenameB' is tracked.
             
         """.trimIndent(), systemOut.linesNormalized)
         systemOut.clear()
