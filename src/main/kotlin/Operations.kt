@@ -112,6 +112,18 @@ class Operations {
     }
 
     fun checkout(branch: List<String>) {
-        println("Restore a file.")
+        if (branch.isEmpty()) {
+            println("Commit id was not passed.")
+            return
+        }
+
+        if (commitsDir.list()?.contains(branch.first()) != true) {
+            println("Commit does not exist.")
+            return
+        }
+
+        val checkoutDir = File("$commitsDir$separator${branch.first()}")
+        checkoutDir.listFiles()?.forEach { file -> file.copyTo(File("$workingDir${file.name}"), true) }
+        println("Switched to commit ${branch.first()}.")
     }
 }

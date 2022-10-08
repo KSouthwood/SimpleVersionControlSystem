@@ -104,3 +104,15 @@ Implement the following commands:
 ### Stage 4: [Checkout time](https://hyperskill.org/projects/177/stages/912/implement)
 
 #### _Add the last command to switch between commits and retrieve the file contents._
+
+In the last stage, implement the `checkout` command. It allows a user to 
+switch between commits and restore the contents of the files according to 
+the current commit.
+
+Get the files you need from the commit directory by the commit ID and 
+rewrite the current files.
+
+The `checkout` command must be passed to the program together with the 
+commit ID to indicate which commit should be used. If a commit with 
+the given ID exists, the contents of the tracked file should be restored in 
+accordance with this commit.
